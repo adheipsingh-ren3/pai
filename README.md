@@ -164,7 +164,20 @@ Once the `ParseableConfig` CR is applied, PAI automatically creates the followin
 ### Metrics
 - **Pod metrics**: Container CPU, memory, network via `kubeletstats` and `k8s_cluster` receivers
 - **Node metrics**: Node-level CPU, memory, disk, network via `kubeletstats` receiver
+- **Traefik metrics**: Optional built-in Prometheus scrape of Traefik pods on `:9100/metrics`
 - Namespace filtering via `namespaceSelector`
+
+Enable Traefik metrics explicitly:
+
+```yaml
+spec:
+  metrics:
+    traefik:
+      enabled: true
+      targetDataset: traefik-metrics
+```
+
+PAI selects pods labeled `app.kubernetes.io/name=traefik`. The scrape is disabled by default. Use `port`, `uri`, or `namespaceSelector` under `traefik` when your deployment differs from the defaults.
 
 ### Events
 - Kubernetes events collected via `k8sobjects` receiver in watch mode

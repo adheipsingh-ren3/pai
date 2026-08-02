@@ -866,7 +866,7 @@ func (r *ParseableConfigReconciler) ensureMetricsEventsCollector(ctx context.Con
 		if anyClusterMetricEnabled(config.Spec.Metrics.ClusterMetrics) {
 			metricsEnabled = true
 		}
-		for _, sc := range config.Spec.Metrics.ScrapeConfigs {
+		for _, sc := range effectiveScrapeConfigs(config.Spec.Metrics) {
 			if sc.Name != "" && sc.TargetDataset != "" && sc.Port > 0 {
 				metricsEnabled = true
 				break
@@ -1045,7 +1045,7 @@ func (r *ParseableConfigReconciler) buildMetricsEventsCollectorConfig(
 
 	// Per-scrape-entry Prometheus pipelines with Kubernetes pod service discovery.
 	if config.Spec.Metrics != nil {
-		for _, sc := range config.Spec.Metrics.ScrapeConfigs {
+		for _, sc := range effectiveScrapeConfigs(config.Spec.Metrics) {
 			id := sanitizeName(sc.Name)
 			if id == "" || sc.TargetDataset == "" || sc.Port <= 0 {
 				continue
@@ -1221,6 +1221,36 @@ func sanitizePromLabel(s string) string {
 		}
 	}
 	return b.String()
+}
+
+// effectiveScrapeConfigs expands opt-in built-in integrations into the same
+// generic scrape representation used by custom scrapeConfigs.
+func effectiveScrapeConfigs(metrics *observabilityv1alpha1.MetricsConfig) []observabilityv1alpha1.ScrapeConfig {
+	if metrics == nil {
+		return nil
+	}
+
+	configs := make([]observabilityv1alpha1.ScrapeConfig, 0, len(metrics.ScrapeConfigs)+1)
+	if traefik := metrics.Traefik; traefik != nil && traefik.Enabled && traefik.TargetDataset != "" {
+		port := traefik.Port
+		if port <= 0 {
+			port = 9100
+		}
+		uri := traefik.URI
+		if uri == "" {
+			uri = "/metrics"
+		}
+		configs = append(configs, observabilityv1alpha1.ScrapeConfig{
+			Name:              "traefik",
+			URI:               uri,
+			Port:              port,
+			TargetDataset:     traefik.TargetDataset,
+			Headers:           traefik.Headers,
+			NamespaceSelector: traefik.NamespaceSelector,
+			PodSelector:       map[string]string{"app.kubernetes.io/name": "traefik"},
+		})
+	}
+	return append(configs, metrics.ScrapeConfigs...)
 }
 
 // anyClusterMetricEnabled reports whether at least one built-in cluster-metrics

@@ -230,11 +230,38 @@ type ScrapeConfig struct {
 	PodSelector map[string]string `json:"podSelector,omitempty"`
 }
 
+// TraefikMetricsConfig configures the built-in Traefik Prometheus scrape.
+// PAI discovers pods with app.kubernetes.io/name=traefik and scrapes
+// /metrics on port 9100.
+type TraefikMetricsConfig struct {
+	// Enabled controls whether Traefik metrics are collected.
+	Enabled bool `json:"enabled"`
+
+	// TargetDataset is the Parseable dataset for Traefik metrics.
+	TargetDataset string `json:"targetDataset,omitempty"`
+
+	// Headers are additional HTTP headers for the exporter. Overrides global headers with the same key.
+	Headers map[string]string `json:"headers,omitempty"`
+
+	// NamespaceSelector limits Traefik pod discovery to matching namespaces.
+	NamespaceSelector NamespaceSelector `json:"namespaceSelector,omitempty"`
+
+	// Port is the Traefik metrics port. Defaults to 9100 when omitted.
+	Port int32 `json:"port,omitempty"`
+
+	// URI is the Traefik metrics path. Defaults to /metrics when omitted.
+	URI string `json:"uri,omitempty"`
+}
+
 // MetricsConfig defines metrics configuration. ClusterMetrics enables built-in
-// kubelet/cluster metrics; ScrapeConfigs adds Prometheus-style scrape pipelines.
+// kubelet/cluster metrics; Traefik enables built-in Traefik discovery;
+// ScrapeConfigs adds custom Prometheus-style scrape pipelines.
 type MetricsConfig struct {
 	// ClusterMetrics toggles built-in node/pod/cluster metrics via kubeletstats + k8s_cluster receivers
 	ClusterMetrics *ClusterMetricsConfig `json:"clusterMetrics,omitempty"`
+
+	// Traefik enables the built-in Traefik Prometheus scrape.
+	Traefik *TraefikMetricsConfig `json:"traefik,omitempty"`
 
 	// ScrapeConfigs is a list of Prometheus-style scrape pipelines
 	ScrapeConfigs []ScrapeConfig `json:"scrapeConfigs,omitempty"`

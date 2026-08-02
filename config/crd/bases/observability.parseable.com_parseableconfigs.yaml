@@ -306,6 +306,52 @@ spec:
                       - uri
                       type: object
                     type: array
+                  traefik:
+                    description: Traefik enables the built-in Traefik Prometheus scrape.
+                    properties:
+                      enabled:
+                        description: Enabled controls whether Traefik metrics are
+                          collected.
+                        type: boolean
+                      headers:
+                        additionalProperties:
+                          type: string
+                        description: Headers are additional HTTP headers for the exporter.
+                          Overrides global headers with the same key.
+                        type: object
+                      namespaceSelector:
+                        description: NamespaceSelector limits Traefik pod discovery
+                          to matching namespaces.
+                        properties:
+                          mode:
+                            description: Mode specifies whether to include or exclude
+                              the listed namespaces
+                            enum:
+                            - include
+                            - exclude
+                            type: string
+                          namespaces:
+                            description: Namespaces is the list of namespace names
+                            items:
+                              type: string
+                            type: array
+                        type: object
+                      port:
+                        description: Port is the Traefik metrics port. Defaults to
+                          9100 when omitted.
+                        format: int32
+                        type: integer
+                      targetDataset:
+                        description: TargetDataset is the Parseable dataset for Traefik
+                          metrics.
+                        type: string
+                      uri:
+                        description: URI is the Traefik metrics path. Defaults to
+                          /metrics when omitted.
+                        type: string
+                    required:
+                    - enabled
+                    type: object
                 type: object
               paused:
                 description: |-
