@@ -1,6 +1,6 @@
 # PAI - Parseable Auto Instrumentation
 
-PAI is a Kubernetes operator that automatically collects logs, metrics, traces, and events from your cluster and sends them to [Parseable](https://parseable.com).
+PAI is a Kubernetes operator that automatically collects logs, metrics, traces, and events from your cluster and sends them to any OTLP compatible backend.
 
 ## Prerequisites
 
