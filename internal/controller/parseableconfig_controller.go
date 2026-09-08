@@ -362,7 +362,7 @@ func (r *ParseableConfigReconciler) ensureCollectorRBAC(ctx context.Context, nam
 				APIGroups: []string{""},
 				Resources: []string{"events", "namespaces", "namespaces/status",
 					"nodes", "nodes/spec", "nodes/stats", "nodes/proxy", "nodes/metrics",
-					"persistentvolumeclaims", "pods", "pods/status",
+					"persistentvolumeclaims", "persistentvolumes", "pods", "pods/status",
 					"replicationcontrollers", "replicationcontrollers/status",
 					"resourcequotas", "services"},
 				Verbs: []string{"get", "list", "watch"},
