@@ -1127,9 +1127,13 @@ func (r *ParseableConfigReconciler) buildMetricsEventsCollectorConfig(
 				}, relabelConfigs...)
 			}
 
+			scrapeInterval := "30s"
+			if sc.ScrapeIntervalSeconds > 0 {
+				scrapeInterval = fmt.Sprintf("%ds", sc.ScrapeIntervalSeconds)
+			}
 			scrapeConfig := map[string]interface{}{
 				"job_name":              id,
-				"scrape_interval":       "30s",
+				"scrape_interval":       scrapeInterval,
 				"metrics_path":          metricsPath,
 				"kubernetes_sd_configs": []interface{}{sdConfig},
 				"relabel_configs":       relabelConfigs,

@@ -239,6 +239,10 @@ type ScrapeConfig struct {
 	// labeldrop metric_relabel_configs). Useful when a label's values would
 	// conflict with an existing column type in the target dataset.
 	DropLabels []string `json:"dropLabels,omitempty"`
+
+	// ScrapeIntervalSeconds overrides the scrape interval (default 30s).
+	// Raise it for expensive targets, e.g. exporters that call paid cloud APIs.
+	ScrapeIntervalSeconds int32 `json:"scrapeIntervalSeconds,omitempty"`
 }
 
 // MetricsConfig defines metrics configuration. ClusterMetrics enables built-in
